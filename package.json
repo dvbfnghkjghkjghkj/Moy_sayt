@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node server.js",
     "build": "node scripts/build-static.js",
+    "publish": "node scripts/build-static.js && git add docs && git commit -m \"Обновление сайта\" && git push",
     "password": "node scripts/set-password.js"
   },
   "engines": {
