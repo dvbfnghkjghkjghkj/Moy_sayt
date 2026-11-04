@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Управление работами</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B0D0C">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <form class="gate-card" id="login-form" novalidate>
+    <p class="gate-mark" aria-hidden="true"></p>
+    <h1 class="gate-title">Управление работами</h1>
+    <p class="gate-text">Введите пароль администратора, чтобы добавлять и править работы.</p>
+    <label class="field">
+      <span class="field-label">Пароль</span>
+      <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+    </label>
+    <p class="form-error" id="login-error" role="alert" hidden></p>
+    <button class="btn btn-primary" type="submit" id="login-submit">Войти</button>
+    <a class="gate-link" href="/">Вернуться на сайт</a>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <header class="bar">
+    <div class="bar-brand"><span class="bar-dot" aria-hidden="true"></span>Управление работами</div>
+    <div class="bar-actions">
+      <a class="btn btn-ghost" href="/" target="_blank" rel="noopener">Открыть сайт</a>
+      <button class="btn btn-ghost" type="button" id="open-settings">Настройки</button>
+      <button class="btn btn-ghost" type="button" id="logout">Выйти</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="head-row">
+      <h1 class="page-title">Работы <span class="page-count" id="works-count"></span></h1>
+      <button class="btn btn-primary" type="button" id="new-work">Новая работа</button>
+    </div>
+    <p class="hint" id="demo-hint" hidden>
+      Ниже — три примера, добавленные при сборке. Замените их своими или
+      <button class="link-btn" type="button" id="clear-demo">удалите одним нажатием</button>.
+    </p>
+    <ul class="works-list" id="works-list"></ul>
+    <p class="empty" id="works-empty" hidden>Работ пока нет. Нажмите «Новая работа» — появятся название, описание и обложка.</p>
+  </main>
+</div>
+
+<dialog class="sheet" id="work-dialog" aria-labelledby="work-dialog-title">
+  <form class="sheet-form" id="work-form" novalidate>
+    <header class="sheet-head">
+      <h2 class="sheet-title" id="work-dialog-title">Новая работа</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Закрыть">×</button>
+    </header>
+
+    <div class="sheet-body">
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">Название</span>
+          <input name="title" maxlength="120" required autocomplete="off" placeholder="Диспетчерская заявок">
+        </label>
+        <label class="field field-year">
+          <span class="field-label">Год</span>
+          <input name="year" inputmode="numeric" maxlength="4" placeholder="2026" autocomplete="off">
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">Категория</span>
+          <input name="category" maxlength="60" list="category-list" autocomplete="off" placeholder="Веб-приложение">
+        </label>
+        <label class="field">
+          <span class="field-label">Стек</span>
+          <input name="stack" autocomplete="off" placeholder="Node.js, React, PostgreSQL">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Краткое описание</span>
+        <input name="summary" maxlength="400" autocomplete="off" placeholder="Одно предложение — попадёт в список работ">
+      </label>
+
+      <label class="field">
+        <span class="field-label">Описание</span>
+        <textarea name="description" rows="9" placeholder="Задача, что сделано, результат. Пустая строка — новый абзац, «- » в начале — пункт списка."></textarea>
+        <span class="field-hint">Поддерживаются абзацы, списки и **полужирный** текст.</span>
+      </label>
+
+      <div class="grid-2">
+        <div class="field">
+          <span class="field-label">Обложка</span>
+          <div class="upload">
+            <div class="cover-preview" id="cover-preview" hidden></div>
+            <div class="upload-actions">
+              <label class="btn btn-ghost btn-file">Выбрать файл<input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif"></label>
+              <button class="link-btn" type="button" id="cover-remove" hidden>Убрать</button>
+            </div>
+            <input type="hidden" name="cover">
+          </div>
+          <span class="field-hint">PNG, JPEG, WebP, GIF или AVIF, до 8 МБ. Лучше 4:3.</span>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Дополнительные изображения</span>
+          <div class="upload-grid" id="gallery-preview"></div>
+          <div class="upload-actions">
+            <label class="btn btn-ghost btn-file">Добавить<input type="file" id="gallery-file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" multiple></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Ссылки</span>
+        <div class="links" id="links-list"></div>
+        <button class="link-btn" type="button" id="add-link">+ Добавить ссылку</button>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Адрес страницы</span>
+        <div class="slug-row">
+          <span class="slug-prefix">/work/</span>
+          <input name="slug" maxlength="60" autocomplete="off" placeholder="dispetcherskaya-zayavok">
+        </div>
+        <span class="field-hint">Латиница, цифры и дефис. Пустое поле — адрес соберётся из названия.</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" name="published" checked>
+        <span>Опубликовано — видно всем на сайте</span>
+      </label>
+    </div>
+
+    <footer class="sheet-foot">
+      <p class="form-error" id="work-error" role="alert" hidden></p>
+      <button class="btn btn-primary" type="submit" id="work-save">Сохранить</button>
+      <button class="btn btn-danger" type="button" id="work-delete" hidden>Удалить</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="settings-dialog" aria-labelledby="settings-title">
+  <form class="sheet-form" id="settings-form" novalidate>
+    <header class="sheet-head">
+      <h2 class="sheet-title" id="settings-title">Настройки сайта</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Закрыть">×</button>
+    </header>
+
+    <div class="sheet-body">
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">Имя или название</span>
+          <input name="siteName" maxlength="80" required autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field-label">Кто вы</span>
+          <input name="role" maxlength="120" autocomplete="off" placeholder="Разработчик — интерфейсы и серверные приложения">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Короткое вступление на главной</span>
+        <textarea name="lead" rows="2" maxlength="400"></textarea>
+      </label>
+
+      <div class="grid-3">
+        <label class="field">
+          <span class="field-label">Статус</span>
+          <input name="status" maxlength="60" autocomplete="off" placeholder="Открыт для проектов">
+        </label>
+        <label class="field">
+          <span class="field-label">Город</span>
+          <input name="city" maxlength="60" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field-label">Стек</span>
+          <input name="stack" maxlength="120" autocomplete="off" placeholder="TypeScript · Node.js · React">
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">Почта</span>
+          <input name="email" type="email" maxlength="120" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field-label">Telegram</span>
+          <input name="telegram" maxlength="120" autocomplete="off" placeholder="@username или ссылка">
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">WhatsApp</span>
+          <input name="whatsapp" maxlength="40" autocomplete="off" inputmode="tel" placeholder="+7 999 123-45-67">
+        </label>
+        <label class="field">
+          <span class="field-label">MAX</span>
+          <input name="max" maxlength="200" autocomplete="off" placeholder="https://max.ru/…">
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label class="field">
+          <span class="field-label">Тема письма</span>
+          <input name="mailSubject" maxlength="160" autocomplete="off" placeholder="Интерфейсы и серверные приложения">
+          <span class="field-hint">Подставляется в письмо, чтобы его было видно среди прочих.</span>
+        </label>
+        <label class="field">
+          <span class="field-label">Первая фраза в WhatsApp</span>
+          <input name="waText" maxlength="200" autocomplete="off" placeholder="Здравствуйте! Пишу с сайта…">
+          <span class="field-hint">Текст уже стоит в сообщении — можно сразу отправлять.</span>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Текст «О себе»</span>
+        <textarea name="about" rows="8"></textarea>
+        <span class="field-hint">Пустая строка между абзацами.</span>
+      </label>
+
+      <div class="field">
+        <span class="field-label">Смена пароля</span>
+        <div class="grid-2">
+          <input type="password" name="currentPassword" autocomplete="current-password" placeholder="Текущий пароль">
+          <input type="password" name="nextPassword" autocomplete="new-password" placeholder="Новый пароль, от 8 символов">
+        </div>
+        <div class="upload-actions">
+          <button class="btn btn-ghost" type="button" id="change-password">Сменить пароль</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sheet-foot">
+      <p class="form-error" id="settings-error" role="alert" hidden></p>
+      <button class="btn btn-primary" type="submit" id="settings-save">Сохранить настройки</button>
+    </footer>
+  </form>
+</dialog>
+
+<datalist id="category-list">
+  <option value="Веб-приложение"></option>
+  <option value="Сайт"></option>
+  <option value="API-сервис"></option>
+  <option value="Бот"></option>
+  <option value="Инструмент"></option>
+  <option value="Мобильное приложение"></option>
+  <option value="Библиотека"></option>
+</datalist>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/js/admin.js" defer></script>
+</body>
+</html>

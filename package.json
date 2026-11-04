@@ -1,0 +1,16 @@
+{
+  "name": "moy-sayt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Портфолио работ на Node.js без внешних зависимостей",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node scripts/build-static.js",
+    "password": "node scripts/set-password.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

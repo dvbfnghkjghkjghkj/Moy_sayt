@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Абстрактная обложка: сетка страниц сайта">
+  <rect width="1200" height="900" fill="#101413"/>
+  <g fill="none" stroke="rgba(236,231,221,0.26)" stroke-width="2">
+    <rect x="120" y="150" width="300" height="240"/>
+    <rect x="450" y="150" width="300" height="240"/>
+    <rect x="780" y="150" width="300" height="240"/>
+    <rect x="120" y="420" width="300" height="330"/>
+    <rect x="780" y="420" width="300" height="330"/>
+  </g>
+  <rect x="450" y="420" width="300" height="330" fill="#d3a34a"/>
+  <g fill="rgba(236,231,221,0.13)">
+    <rect x="150" y="500" width="180" height="12"/>
+    <rect x="150" y="530" width="240" height="12"/>
+    <rect x="150" y="560" width="140" height="12"/>
+    <rect x="810" y="500" width="200" height="12"/>
+    <rect x="810" y="530" width="150" height="12"/>
+  </g>
+  <g fill="rgba(236,231,221,0.30)">
+    <rect x="150" y="480" width="26" height="26"/>
+    <rect x="480" y="480" width="26" height="26"/>
+  </g>
+  <path d="M120 780h960" stroke="rgba(236,231,221,0.18)" stroke-width="1"/>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Абстрактная обложка: звуковые дорожки">
+  <rect width="1200" height="900" fill="#101413"/>
+  <circle cx="600" cy="450" r="330" fill="none" stroke="rgba(236,231,221,0.10)" stroke-width="1"/>
+  <circle cx="600" cy="450" r="240" fill="none" stroke="rgba(236,231,221,0.14)" stroke-width="1"/>
+  <circle cx="600" cy="450" r="150" fill="none" stroke="rgba(236,231,221,0.18)" stroke-width="1"/>
+  <g fill="rgba(236,231,221,0.22)">
+    <rect x="150" y="392" width="26" height="116"/>
+    <rect x="206" y="352" width="26" height="196"/>
+    <rect x="262" y="410" width="26" height="80"/>
+    <rect x="318" y="322" width="26" height="256"/>
+    <rect x="374" y="368" width="26" height="164"/>
+    <rect x="430" y="300" width="26" height="300"/>
+    <rect x="744" y="318" width="26" height="264"/>
+    <rect x="800" y="382" width="26" height="136"/>
+    <rect x="856" y="338" width="26" height="224"/>
+    <rect x="912" y="402" width="26" height="96"/>
+    <rect x="968" y="358" width="26" height="184"/>
+    <rect x="1024" y="412" width="26" height="76"/>
+  </g>
+  <g fill="#d3a34a">
+    <rect x="486" y="268" width="26" height="364"/>
+    <rect x="542" y="330" width="26" height="240"/>
+    <rect x="598" y="292" width="26" height="316"/>
+    <rect x="654" y="352" width="26" height="196"/>
+  </g>
+  <rect x="486" y="632" width="194" height="3" fill="#d3a34a"/>
+</svg>
