@@ -7,6 +7,12 @@
 
 ## Запуск
 
+Двойной клик по `start-server.cmd` — запустит сервер и через пару секунд
+откроет сайт в браузере. Окно закрывать не нужно: это и есть работающий сервер,
+Ctrl+C или закрытие окна его останавливает.
+
+Или вручную:
+
 ```powershell
 node server.js
 ```
@@ -58,6 +64,7 @@ node scripts/set-password.js "новый пароль"
 
 ```
 server.js            сервер: страницы, API, загрузка файлов
+start-server.cmd     запуск двойным кликом (Windows)
 app.js               точка входа для Passenger (uCoz)
 lib/store.js         хранилище data/db.json (атомарная запись)
 lib/contacts.js      ссылки на почту, WhatsApp и MAX, метка в сообщении
