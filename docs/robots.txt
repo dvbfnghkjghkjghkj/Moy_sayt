@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://dvbfnghkjghkjghkj.github.io/Moy_sayt/sitemap.xml
