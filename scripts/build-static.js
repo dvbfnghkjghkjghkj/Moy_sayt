@@ -249,8 +249,12 @@ async function dirSize(dir) {
   console.log(`  файлов:    ${result.assets.length + result.pages.length}`);
   console.log(`  объём:     ${(result.size / 1024 / 1024).toFixed(2)} МБ`);
   console.log('');
-  console.log('Опубликовать на GitHub Pages: закоммитьте каталог и включите Pages');
-  console.log(`(Settings → Pages → ветка main, папка /${config.out}).`);
+  if (process.env.PUBLISH_QUIET) {
+    console.log(`Готово: ${path.relative(ROOT, result.out)} обновлён.`);
+  } else {
+    console.log('Опубликовать на GitHub Pages: закоммитьте каталог и включите Pages');
+    console.log(`(Settings → Pages → ветка main, папка /${config.out}).`);
+  }
 })().catch((err) => {
   console.error('Сборка не удалась:', err.message);
   process.exit(1);

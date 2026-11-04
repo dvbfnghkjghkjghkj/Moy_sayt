@@ -282,11 +282,27 @@ function sniffImage(buffer) {
 
 let publishing = false;
 
-function runStep(command, args, timeoutMs) {
+/** Адрес опубликованного сайта: конфиг сборки важнее настроек. */
+function publishedUrl() {
+  try {
+    const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'static.config.json'), 'utf8'));
+    if (config.url) return String(config.url);
+  } catch {
+    /* конфига может не быть */
+  }
+  return process.env.SITE_URL || '';
+}
+
+function runStep(command, args, timeoutMs, env = {}) {
   return new Promise((resolve) => {
     let child;
     try {
-      child = spawn(command, args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+      child = spawn(command, args, {
+        cwd: ROOT,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+        env: { ...process.env, ...env },
+      });
     } catch (err) {
       resolve({ code: -1, output: `не удалось запустить «${command}»: ${err.message}` });
       return;
@@ -320,13 +336,19 @@ async function publishSite() {
     return result;
   };
 
-  const build = record('Сборка статики', await runStep(process.execPath, ['scripts/build-static.js'], 120000));
+  const build = record(
+    'Сборка статики',
+    await runStep(process.execPath, ['scripts/build-static.js'], 120000, { PUBLISH_QUIET: '1' }),
+  );
   if (build.code !== 0) return { ok: false, error: 'Сборка не прошла', steps };
 
-  const stage = record('Подготовка файлов', await runStep('git', ['add', '-A'], 60000));
+  // Предупреждения о переводах строк в журнале только мешают.
+  const gitQuiet = ['-c', 'core.autocrlf=false', '-c', 'core.safecrlf=false'];
+
+  const stage = record('Подготовка файлов', await runStep('git', [...gitQuiet, 'add', '-A'], 60000));
   if (stage.code !== 0) return { ok: false, error: 'git add не сработал', steps };
 
-  const commit = record('Коммит', await runStep('git', ['commit', '-m', 'Обновление сайта'], 60000));
+  const commit = record('Коммит', await runStep('git', [...gitQuiet, 'commit', '-m', 'Обновление сайта'], 60000));
   const nothingNew = commit.code !== 0 && /nothing to commit|нечего коммитить/i.test(commit.output);
   if (nothingNew) steps[steps.length - 1] = { name: 'Коммит: изменений нет', code: 0, output: commit.output };
   else if (commit.code !== 0) return { ok: false, error: 'git commit не сработал', steps };
@@ -511,8 +533,7 @@ async function api(req, res, url) {
     publishing = true;
     try {
       const result = await publishSite();
-      const url = process.env.SITE_URL || db.settings.siteUrl || '';
-      return json(res, result.ok ? 200 : 500, { ...result, url });
+      return json(res, result.ok ? 200 : 500, { ...result, url: publishedUrl() });
     } finally {
       publishing = false;
     }
