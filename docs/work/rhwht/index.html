@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>rhwht — Aleks69</title>
-<meta name="description" content="shb">
+<title>repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — Aleks69</title>
+<meta name="description" content="Telegram-бот, который заменяет репетитору таблицы и блокноты: ученики, расписание занятий, долги и оплаты — всё в одном чате. Версия 2 — самостоятельный многопользовательский сервис с подпиской, бесплатным триалом и жёсткой изоляцией данных между пользователями.">
 
 <meta name="theme-color" content="#0B0D0C">
 <meta property="og:type" content="website">
-<meta property="og:title" content="rhwht — Aleks69">
-<meta property="og:description" content="shb">
+<meta property="og:title" content="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — Aleks69">
+<meta property="og:description" content="Telegram-бот, который заменяет репетитору таблицы и блокноты: ученики, расписание занятий, долги и оплаты — всё в одном чате. Версия 2 — самостоятельный многопользовательский сервис с подпиской, бесплатным триалом и жёсткой изоляцией данных между пользователями.">
 <link rel="icon" href="/Moy_sayt/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,13 +31,31 @@
   <a class="back" href="/Moy_sayt/#works">← Все работы</a>
   <header class="work-head">
     <p class="work-cat">Бот</p>
-    <h1 class="work-title">rhwht</h1>
-    <p class="work-summary">shb</p>
+    <h1 class="work-title">repetitorbot — Telegram-бот для учёта учеников, занятий и оплат</h1>
+    <p class="work-summary">Telegram-бот, который заменяет репетитору таблицы и блокноты: ученики, расписание занятий, долги и оплаты — всё в одном чате. Версия 2 — самостоятельный многопользовательский сервис с подпиской, бесплатным триалом и жёсткой изоляцией данных между пользователями.</p>
   </header>
-  <dl class="facts"><div class="fact"><dt>Год</dt><dd>2026</dd></div></dl>
+  <dl class="facts"><div class="fact"><dt>Год</dt><dd>2026</dd></div><div class="fact"><dt>Стек</dt><dd>Python 3.13, aiogram 3.31 (Telegram Bot API, long polling, FSM-сценарии) PostgreSQL 16+ (v2, многопользовательский режим): psycopg 3, пул соединений, SQL-миграции; в v1 — SQLite Telegram Sta, pre-checkout, successful_payment, возвраты pytest 8.4.2 + pytest-asyncio —, async-тесты на реальном PostgreSQL с изо, zoneinfo/tzdata (часовые пояса), systemd, Ubuntu 24.04</dd></div><div class="fact"><dt>Ссылки</dt><dd class="fact-links"><a href="https://t.me/D8A3V69" rel="noopener">это я</a></dd></div></dl>
+  <figure class="work-cover"><img src="/Moy_sayt/uploads/mw2lxc0b-b0f93e553da9.png" alt="Обложка проекта «repetitorbot — Telegram-бот для учёта учеников, занятий и оплат»" decoding="async"></figure>
+  <div class="prose work-body"><p>Частный репетитор ведёт десятки учеников и считает деньги вручную: кто сколько должен, когда следующее занятие, кто предупредил об отмене. Готовые CRM избыточны и стоят денег, а таблицы быстро расходятся с реальностью. repetitorbot решает это там, где репетитор и так проводит день — в Telegram.</p>
+<p>Что умеет бот</p>
+<p>Список учеников: имя, предмет, цена занятия, контакт, заметка, архив. Тёзки различаются в кнопках по заметке, а без неё — по номеру (Иван (Петров) / Иван (#7)). Планирование занятия через календарь: месяц → день → часы → минуты → длительность. Прошедшие дни в календаре видны, но недоступны, сегодняшний выделен. Закрытие занятия итогом: проведено / прогул / отменено / перенесено. Перенос создаёт новое занятие, а не переписывает историю. Автоматический расчёт долга и аванса: долг = проведённые занятия − оплаты. Никакой ручной арифметики. Оплаты с историей и приём платежей через Telegram Stars, планы подписки, продление, возвраты. Экспорт данных в JSON и CSV (ZIP) — данные не заперты внутри бота. Часовые пояса: 11 зон, все даты и суммы показываются в поясе пользователя. Инженерные решения, которыми проект интересен</p>
+<p>Изоляция данных как инвариант. В v2 каждый пользователь видит только своё: все запросы идут с user_id, внешние ключи составные (user_id, id), а на это есть отдельный набор тестов изоляции. Защита от злоупотребления триалом. 7 дней бесплатно, но повторный триал не выдаётся: в trial_ledger хранится хэш идентификатора с солью, а не сам идентификатор. Плюс админ-команда /trial &lt;id&gt; &lt;дней&gt; для продления тестировщикам. Юридический слой. Экран согласия с публичной офертой и политикой конфиденциальности (ссылки на документы), фиксация даты и версии согласия, удаление данных по /delete_me. Тексты вынесены в конфиг, чтобы менять их без правки кода. Админка в Telegram: статистика, продление доступа, отзыв, возвраты, чеки, журнал действий с аудитом. Тесты вместо надежды. 249 автотестов v2 покрывают сценарии, а не только функции: фейковый Telegram-транспорт, реальный PostgreSQL с отдельной схемой на каждый тест, регресс-тесты на баги, найденные на живом сервере — «message is not modified» при повторном нажатии кнопки, сдвиг дней в календаре, parse_mode=HTML. Деплой как часть продукта. systemd-юнит с RestartPreventExitStatus=2 (второй экземпляр бота на том же токене не должен перезапускаться бесконечно), режим --check для проверки конфига и базы без запуска polling, документированный перенос на VPS и бэкапы. Безопасность по умолчанию: секреты только в .env, маскирование в логах и трейсбеках, repr конфига не печатает токен и пароль. Результат. Рабочий бот, которым можно пользоваться каждый день, и вторая версия — многопользовательский сервис с подпиской, триалом, оплатой и админкой. Проект довёл от спецификации до сервера: код, тесты, миграции, юридические тексты, документация по установке и инструкция для новичка на PowerShell.</p></div>
+  <div class="gallery"><figure>
+  <img src="/Moy_sayt/uploads/mw2lxrvh-1b4c62e9a1c6.png" alt="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — изображение 1" loading="lazy" decoding="async">
   
-  <div class="prose work-body"><p>brtebrt</p></div>
+</figure><figure>
+  <img src="/Moy_sayt/uploads/mw2lxrwr-0bb802f858c2.png" alt="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — изображение 2" loading="lazy" decoding="async">
   
+</figure><figure>
+  <img src="/Moy_sayt/uploads/mw2lxrxc-1f51c57e9a18.png" alt="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — изображение 3" loading="lazy" decoding="async">
+  
+</figure><figure>
+  <img src="/Moy_sayt/uploads/mw2lxrxx-a3050c1266d3.png" alt="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — изображение 4" loading="lazy" decoding="async">
+  
+</figure><figure>
+  <img src="/Moy_sayt/uploads/mw2lxryx-590aec878100.png" alt="repetitorbot — Telegram-бот для учёта учеников, занятий и оплат — изображение 5" loading="lazy" decoding="async">
+  
+</figure></div>
   <section class="contact-strip" aria-labelledby="contact-strip-title">
   <div class="contact-strip-text">
     <h2 class="contact-strip-title" id="contact-strip-title">Обсудить задачу</h2>
