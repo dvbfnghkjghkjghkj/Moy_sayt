@@ -713,6 +713,32 @@ textarea:focus-visible {
 
 /* ── Уведомление ───────────────────────────────────────────────── */
 
+.publish-log {
+  margin: 0;
+  padding: 14px 16px;
+  max-height: min(46vh, 360px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--bg-input);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 2;
+}
+
+.publish-log:empty {
+  display: none;
+}
+
+.publish-log:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
 .toast {
   position: fixed;
   left: 50%;

@@ -38,6 +38,11 @@
     settingsDialog: $('#settings-dialog'),
     settingsForm: $('#settings-form'),
     settingsError: $('#settings-error'),
+    publishBtn: $('#publish-btn'),
+    publishDialog: $('#publish-dialog'),
+    publishStatus: $('#publish-status'),
+    publishLog: $('#publish-log'),
+    publishError: $('#publish-error'),
     toast: $('#toast'),
   };
 
@@ -457,6 +462,68 @@
     } catch (error) {
       toast(error.message, true);
     }
+  });
+
+  /* ── Публикация ──────────────────────────────────────────────── */
+
+  function renderPublish(result) {
+    const lines = (result.steps || []).map((step) => {
+      const mark = step.code === 0 ? '✓' : '✗';
+      const body = step.output
+        ? `\n${step.output
+            .split('\n')
+            .map((line) => `  ${line}`)
+            .join('\n')}`
+        : '';
+      return `${mark} ${step.name}${body}`;
+    });
+    els.publishLog.textContent = lines.join('\n\n') || 'Вывода нет.';
+    els.publishLog.scrollTop = 0;
+  }
+
+  async function publish() {
+    els.publishBtn.disabled = true;
+    els.publishBtn.textContent = 'Публикую…';
+    els.publishLog.textContent = '';
+    els.publishStatus.textContent = 'Собираю сайт и отправляю на GitHub…';
+    setError(els.publishError, '');
+    els.publishDialog.showModal();
+
+    try {
+      const response = await fetch('/api/publish', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-Portfolio-CSRF': '1' },
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        showGate();
+        throw new Error('Сессия истекла — войдите заново');
+      }
+
+      renderPublish(data);
+
+      if (response.ok && data.ok) {
+        els.publishStatus.textContent = data.url
+          ? `Готово. GitHub Pages обновит сайт за минуту: ${data.url}`
+          : 'Готово. GitHub Pages обновит сайт за минуту.';
+      } else {
+        els.publishStatus.textContent = 'Публикация не прошла.';
+        setError(els.publishError, data.error || `Ошибка ${response.status}`);
+      }
+    } catch (error) {
+      els.publishStatus.textContent = 'Публикация не прошла.';
+      setError(els.publishError, error.message);
+    } finally {
+      els.publishBtn.disabled = false;
+      els.publishBtn.textContent = 'Опубликовать';
+    }
+  }
+
+  els.publishBtn.addEventListener('click', () => {
+    if (els.publishDialog.open) return;
+    publish();
   });
 
   /* ── Настройки ───────────────────────────────────────────────── */

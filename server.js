@@ -10,6 +10,7 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { spawn } = require('node:child_process');
 
 const store = require('./lib/store');
 const auth = require('./lib/auth');
@@ -277,6 +278,65 @@ function sniffImage(buffer) {
   return '';
 }
 
+/* ── Публикация статики ─────────────────────────────────────────── */
+
+let publishing = false;
+
+function runStep(command, args, timeoutMs) {
+  return new Promise((resolve) => {
+    let child;
+    try {
+      child = spawn(command, args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+    } catch (err) {
+      resolve({ code: -1, output: `не удалось запустить «${command}»: ${err.message}` });
+      return;
+    }
+
+    let output = '';
+    const MAX_OUTPUT = 32 * 1024;
+    const collect = (chunk) => {
+      if (output.length < MAX_OUTPUT) output += chunk.toString('utf8');
+    };
+    child.stdout.on('data', collect);
+    child.stderr.on('data', collect);
+
+    const timer = setTimeout(() => child.kill(), timeoutMs);
+    child.on('error', (err) => {
+      clearTimeout(timer);
+      resolve({ code: -1, output: `${output}\n${err.message}`.trim() });
+    });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      resolve({ code, output: output.trim() });
+    });
+  });
+}
+
+/** Собирает статику и отправляет её на GitHub. Возвращает шаги с выводом. */
+async function publishSite() {
+  const steps = [];
+  const record = (name, result) => {
+    steps.push({ name, code: result.code, output: result.output.slice(-6000) });
+    return result;
+  };
+
+  const build = record('Сборка статики', await runStep(process.execPath, ['scripts/build-static.js'], 120000));
+  if (build.code !== 0) return { ok: false, error: 'Сборка не прошла', steps };
+
+  const stage = record('Подготовка файлов', await runStep('git', ['add', '-A'], 60000));
+  if (stage.code !== 0) return { ok: false, error: 'git add не сработал', steps };
+
+  const commit = record('Коммит', await runStep('git', ['commit', '-m', 'Обновление сайта'], 60000));
+  const nothingNew = commit.code !== 0 && /nothing to commit|нечего коммитить/i.test(commit.output);
+  if (nothingNew) steps[steps.length - 1] = { name: 'Коммит: изменений нет', code: 0, output: commit.output };
+  else if (commit.code !== 0) return { ok: false, error: 'git commit не сработал', steps };
+
+  const push = record('Отправка на GitHub', await runStep('git', ['push'], 120000));
+  if (push.code !== 0) return { ok: false, error: 'git push не сработал', steps };
+
+  return { ok: true, steps };
+}
+
 /* ── API ────────────────────────────────────────────────────────── */
 
 function requireCsrf(req, res) {
@@ -444,6 +504,18 @@ async function api(req, res, url) {
 
     store.mutate((d) => Object.assign(d.settings, next));
     return json(res, 200, { settings: db.settings });
+  }
+
+  if (route === '/api/publish' && method === 'POST') {
+    if (publishing) return json(res, 409, { error: 'Публикация уже идёт — подождите' });
+    publishing = true;
+    try {
+      const result = await publishSite();
+      const url = process.env.SITE_URL || db.settings.siteUrl || '';
+      return json(res, result.ok ? 200 : 500, { ...result, url });
+    } finally {
+      publishing = false;
+    }
   }
 
   if (route === '/api/password' && method === 'POST') {

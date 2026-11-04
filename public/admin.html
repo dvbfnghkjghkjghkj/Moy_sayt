@@ -34,6 +34,7 @@
     <div class="bar-brand"><span class="bar-dot" aria-hidden="true"></span>Управление работами</div>
     <div class="bar-actions">
       <a class="btn btn-ghost" href="/" target="_blank" rel="noopener">Открыть сайт</a>
+      <button class="btn" type="button" id="publish-btn">Опубликовать</button>
       <button class="btn btn-ghost" type="button" id="open-settings">Настройки</button>
       <button class="btn btn-ghost" type="button" id="logout">Выйти</button>
     </div>
@@ -244,6 +245,25 @@
       <button class="btn btn-primary" type="submit" id="settings-save">Сохранить настройки</button>
     </footer>
   </form>
+</dialog>
+
+<dialog class="sheet" id="publish-dialog" aria-labelledby="publish-title">
+  <div class="sheet-form">
+    <header class="sheet-head">
+      <h2 class="sheet-title" id="publish-title">Публикация на GitHub Pages</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Закрыть">×</button>
+    </header>
+
+    <div class="sheet-body">
+      <p class="hint" id="publish-status">Собираю сайт и отправляю на GitHub…</p>
+      <pre class="publish-log" id="publish-log" aria-live="polite" tabindex="0"></pre>
+    </div>
+
+    <footer class="sheet-foot">
+      <p class="form-error" id="publish-error" role="alert" hidden></p>
+      <button class="btn btn-primary" type="button" data-close>Готово</button>
+    </footer>
+  </div>
 </dialog>
 
 <datalist id="category-list">
