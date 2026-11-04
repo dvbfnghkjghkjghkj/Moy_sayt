@@ -434,7 +434,9 @@ async function api(req, res, url) {
       } catch {
         host = '';
       }
-      if (!host || !/(^|\.)max\.ru$/i.test(host)) throw badRequest('Ссылка MAX указана неверно');
+      if (!host || !/(^|\.)max\.ru$/i.test(host)) {
+        throw badRequest('Ссылка MAX указана неверно: нужна ссылка на профиль вида https://max.ru/… или @ник, телефон не подойдёт');
+      }
       next.max = normalized;
     }
     if (next.mailSubject !== undefined) next.mailSubject = next.mailSubject.slice(0, 160);
